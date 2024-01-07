@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debouncing</title>
+    <style>
+        * {
+            margin: 0;
+            box-sizing: border-box;
+            padding: 0;
+        }
+
+        body {
+            background: #767676;
+            height: 100vh;
+            padding: 30px;
+            width: 100%;
+            object-fit: cover;
+            background-size: 100%;
+            background-repeat: no-repeat;
+        }
+
+        h1{
+            text-align: center;
+            color: #fff;
+        }
+
+        input {
+            margin: 30px auto 30px;
+            width: 500px;
+            display: block;
+            height: 60px;
+            outline: 0;
+            padding: 0 20px;
+            font-size: 22px;
+            border-radius: 5px;
+            border: 1px solid #ffffff;
+        }
+
+        #root {
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+            gap: 30px;
+        }
+
+        .outerbox {
+            box-shadow: 0px 0px 8px -3px rgb(144, 144, 144);
+            padding: 20px;
+            width: 320px;
+            border-radius: 5px;
+            background: #fff;
+        }
+
+        .outerbox img {
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        h2 {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Movie Search</h1>
+    <input type="text" id="search" oninput="debounce(searchMovies, 1000)" />
+    <div id="root"></div>
+
+    <script>
+        var list = document.querySelector("#root");
+        var timer;
+
+        async function searchMovies() {
+            var API_KEY = '839d8529';
+            var search = document.querySelector("#search").value;
+
+            try {
+                var res = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${search}`);
+                var data = await res.json();
+
+                renderMovie(data);
+
+                return data;
+            } catch (error) {
+                return error;
+            }
+        }
+
+        function renderMovie(data) {
+            list.innerHTML = "";
+            let div = document.createElement("div");
+            div.className = "outerbox";
+            let img = document.createElement("img");
+            img.src = data.Poster;
+            let h3 = document.createElement("h2");
+            h3.textContent = data.Title;
+            div.append(img, h3);
+            list.append(div);
+
+            var input = document.querySelector("#search").value;
+            if (input === "") {
+                list.innerHTML = "";
+            }
+        }
+
+        function debounce(func, delay) {
+            clearTimeout(timer);
+            timer = setTimeout(func, delay);
+        }
+    </script>
+</body>
+
+</html>

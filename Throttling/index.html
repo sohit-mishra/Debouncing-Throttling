@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Throttling</title>
+    <style> * {
+        margin: 0;
+        box-sizing: border-box;
+        padding: 0;
+    }
+
+    body {
+        background: #767676;
+        height: 100vh;
+        padding: 30px;
+        width: 100%;
+        object-fit: cover;
+        background-size: 100%;
+        background-repeat: no-repeat;
+    }
+
+    h1{
+        text-align: center;
+        color: #fff;
+    }
+
+    input {
+        margin: 30px auto 30px;
+        width: 340px;
+        display: block;
+        height: 35px;
+        outline: 0;
+        padding: 0 15px;
+        border-radius: 5px;
+        border: 1px solid #ffffff;
+    }
+
+    #root {
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+        gap: 30px;
+    }
+
+    .outerbox {
+        box-shadow: 0px 0px 8px -3px rgb(144, 144, 144);
+        padding: 20px;
+        width: 320px;
+        border-radius: 5px;
+        background: #fff;
+    }
+
+    .outerbox img {
+        width: 100%;
+        border-radius: 5px;
+    }
+
+    h2 {
+        margin: 5px 0;
+    }
+    </style>
+</head>
+
+<body>
+    <h1>Meal Name</h1>
+    <input type="text" id="search" onkeyup="throttledMeal()" />
+    <div id="root"></div>
+
+    <script>
+        var list = document.querySelector("#root");
+        var timer;
+
+        function throttle(func, delay) {
+            clearTimeout(timer);
+            timer = setTimeout(func, delay);
+        }
+
+        function throttledMeal() {
+            throttle(meal, 1000);
+        }
+
+        async function meal() {
+            var search = document.querySelector("#search").value;
+            try {
+                var res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${search}`);
+                var data = await res.json();
+
+                list.innerHTML = "";
+
+                data.meals.forEach(element => {
+                    let div = document.createElement("div");
+                    div.className = "outerbox";
+                    let img = document.createElement("img");
+                    img.src = element.strMealThumb;
+                    let h3 = document.createElement("h2");
+                    h3.textContent = element.strMeal;
+                    div.append(img, h3);
+                    list.append(div);
+                });
+
+                return data;
+            } catch (error) {
+                return error;
+            }
+        }
+    </script>
+</body>
+
+</html>
